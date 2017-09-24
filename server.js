@@ -24,7 +24,8 @@ app.use(bodyParser.urlencoded({
 app.use(express.static("public"));
 
 // Database configuration with mongoose
-var databaseUri = 'mongodb://localhost/scraper';
+var databaseUri = 'mongodb://heroku_qcp99lh2:qvol252f4vup0c0je27aki5n63@ds147884.mlab.com:47884/heroku_qcp99lh2';
+// var databaseUri = 'mongodb://localhost/scraper';
 if (process.env.MONGODB_URI) { 
   var promise = mongoose.connect(process.env.MONGODB_URI)
 } else {
@@ -50,8 +51,8 @@ db.once("open", function() {
 
 // Database configuration
 // Save the URL of our database as well as the name of our collection
-// const databaseUrl = "scrapedb";
-// const collections = ["scrapeCol"];
+const databaseUrl = "scraper";
+const collections = ["scrapeData"];
 
 // // Use mongojs to hook the database to the db variable
 // var db = mongojs(databaseUrl, collections);
@@ -81,7 +82,7 @@ app.get("/scraper", (req, res) => {
 			res.json(html)
 
 			if(title && link){
-				db.scrapeCol.insert({"title": title, "link":link}, (err, inserted) => {
+				db.scrapedData.insert({"title": title, "link":link}, (err, inserted) => {
 					console.log(inserted); 
 				});
 			}
@@ -93,7 +94,7 @@ app.get("/scraper", (req, res) => {
 // 2. At the "/all" path, display every entry in the animals collection
 app.get("/all", (req, res) => {
   // Query: In our database, go to the collection, then "find" everything
-  db.scrapeCol.find({}, (err, found) => {
+  db.scrapedData.find({}, (err, found) => {
     // Log any errors if the server encounters one
     if (err) {
       console.log(err);
