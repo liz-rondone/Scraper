@@ -32,23 +32,33 @@ app.get("/", function(req, res) {
 
 // scrape data
 app.get("/scrape", function(req, res) {
-    request("https://news.ycombinator.com/", function(error, response, html) {
-        var $ = cheerio.load(html);
-        $(".title").each(function(i, element){
-            var title = $(element).children("a").text();
-            var link = $(element).children("a").attr("href");
-            console.log(title);
-        })
-    });
+	request("https://news.ycombinator.com/", function(error, response, html) {
+		var $ = cheerio.load(html);
+		$(".title").each(function(i, element){
+			//parsing HTML
+			var title = $(element).children("a").text();
+			var link = $(element).children("a").attr("href");
+			console.log(title);
+
+			res.json(html)
+
+			if(title && link){
+				db.scrapedData.insert({"title": title, "link":link}, function(err, inserted) {
+					console.log(inserted); 
+				});
+			}
+		})
+	})
+	res.send("data inserted");
 });
 
 // 2. At the "/all" path, display every entry in the animals collection
 app.get("/all", function(req, res) {
-  // Query: In our database, go to the animals collection, then "find" everything
-  db.animals.find({}, function(error, found) {
+  // Query: In our database, go to the collection, then "find" everything
+  db.scrapedData.find({}, function(err, found) {
     // Log any errors if the server encounters one
-    if (error) {
-      console.log(error);
+    if (err) {
+      console.log(err);
     }
     // Otherwise, send the result of this query to the browser
     else {
@@ -58,36 +68,36 @@ app.get("/all", function(req, res) {
 });
 
 // 3. At the "/name" path, display every entry in the animals collection, sorted by name
-app.get("/name", function(req, res) {
-  // Query: In our database, go to the animals collection, then "find" everything,
-  // but this time, sort it by name (1 means ascending order)
-  db.animals.find().sort({ name: 1 }, function(error, found) {
-    // Log any errors if the server encounters one
-    if (error) {
-      console.log(error);
-    }
-    // Otherwise, send the result of this query to the browser
-    else {
-      res.json(found);
-    }
-  });
-});
+// app.get("/name", function(req, res) {
+//   // Query: In our database, go to the animals collection, then "find" everything,
+//   // but this time, sort it by name (1 means ascending order)
+//   db.animals.find().sort({ name: 1 }, function(error, found) {
+//     // Log any errors if the server encounters one
+//     if (error) {
+//       console.log(error);
+//     }
+//     // Otherwise, send the result of this query to the browser
+//     else {
+//       res.json(found);
+//     }
+//   });
+// });
 
 // 4. At the "/weight" path, display every entry in the animals collection, sorted by weight
-app.get("/weight", function(req, res) {
-  // Query: In our database, go to the animals collection, then "find" everything,
-  // but this time, sort it by weight (-1 means descending order)
-  db.animals.find().sort({ weight: -1 }, function(error, found) {
-    // Log any errors if the server encounters one
-    if (error) {
-      console.log(error);
-    }
-    // Otherwise, send the result of this query to the browser
-    else {
-      res.json(found);
-    }
-  });
-});
+// app.get("/weight", function(req, res) {
+//   // Query: In our database, go to the animals collection, then "find" everything,
+//   // but this time, sort it by weight (-1 means descending order)
+//   db.animals.find().sort({ weight: -1 }, function(error, found) {
+//     // Log any errors if the server encounters one
+//     if (error) {
+//       console.log(error);
+//     }
+//     // Otherwise, send the result of this query to the browser
+//     else {
+//       res.json(found);
+//     }
+//   });
+// });
 
 // Set the app to listen on port 3000
 app.listen(3000, function() {
