@@ -1,30 +1,52 @@
 <!DOCTYPE html>
 <html lang="en-us">
+
   <head>
     <meta charset="UTF-8">
-    <title>Scraper</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="style.css">
-  </head>
+		<title>Scraper</title>
+
+		<!-- JQUERY-->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+		<!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" 
+    integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+
+    <!-- RESET -->
+    <link rel="stylesheet" type="text/css" href="assets/css/reset.css">
+    
+    <!-- BOOTSWATCH THEME -->
+    <link rel="stylesheet" type="text/css" href="assets/css/cosmo-theme.css">
+
+		<!-- STYLESHEET -->
+		<link rel="stylesheet" href="assets/style.css">
+		
+	</head>
+	
   <body>
-    <div id="buttons">
-      <button id="weight-sort">Sort By Weight</button>
-      <button id="name-sort">Sort By Name</button>
-    </div>
-    <table id="results">
-      <thead>
-        <tr>
-          <th id="animal-name">Name</th>
-          <th id="animal-legs">Num Legs</th>
-          <th id="animal-class">Class</th>
-          <th id="animal-weight">Weight</th>
-          <th id="animal-new-name">But I'd Call It...</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Results from DB here -->
-      </tbody>
-    </table>
-    <script src="app.js"></script>
-  </body>
+
+		<div class="jumbotron">
+			<center>
+				<h1>Scraper, No Scraping!</h1>
+				<p></p>
+				<p>"With great power comes great responsibility." &nbsp; &ndash; Uncle Ben</p>
+			</center>
+		</div>
+
+		<div>
+
+			<table id="results" class="table table-striped table-hover">
+				
+				<tbody class="padding">
+					<!-- Results from DB here -->
+				</tbody>
+				
+			</table>
+
+		</div>
+		
+		<script src="app.js"></script>
+		
+	</body>
+	
 </html>
