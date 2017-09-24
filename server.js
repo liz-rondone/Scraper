@@ -1,49 +1,87 @@
 // Dependencies
 var express = require("express");
-var mongojs = require("mongojs");
-// dependencies for scraping
+var exphbs = require("express-handlebars");
+var bodyParser = require("body-parser");
+var logger = require("morgan");
+var mongoose = require("mongoose");
 var request = require("request");
 var cheerio = require("cheerio");
+var PORT = process.env.PORT || 3000;
+
+// Set mongoose to leverage built in JavaScript ES6 Promises
+mongoose.Promise = Promise;
 
 // Initialize Express
 var app = express();
 
-// Set up a static folder (public) for our web app
+// Use morgan and body parser with our app
+app.use(logger("dev"));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
+
+// Make public a static dir
 app.use(express.static("public"));
 
-// Database configuration
-// Save the URL of our database as well as the name of our collection
-var databaseUrl = "scraper";
-var collections = ["scrapedData"];
-
-// Use mongojs to hook the database to the db variable
-var db = mongojs(databaseUrl, collections);
+// Database configuration with mongoose
+var databaseUri = 'mongodb://localhost/scraper';
+if (process.env.MONGODB_URI) { 
+  var promise = mongoose.connect(process.env.MONGODB_URI)
+} else {
+  var promise = mongoose.connect(databaseUri, {
+    useMongoClient: true,
+  });
+}
+var db = mongoose.connection;
 
 // This makes sure that any errors are logged if mongodb runs into an issue
-db.on("error", function(error) {
+db.on("error", (error) => {
   console.log("Database Error:", error);
 });
 
+// Once logged in to the db through mongoose, log a success message
+db.once("open", function() {
+  console.log("Mongoose connection successful.");
+});
+
+
+
+
+
+// Database configuration
+// Save the URL of our database as well as the name of our collection
+// const databaseUrl = "scrapedb";
+// const collections = ["scrapeCol"];
+
+// // Use mongojs to hook the database to the db variable
+// var db = mongojs(databaseUrl, collections);
+
+// Routing 
+// var scraperoutes = require("./routes/scrapecontroller.js");
+// app.use('/', scraperoutes);
+// app.use('/scraper', scraperoutes);
+// app.use('/update', scraperoutes);
+
 // Routes
 // 1. At the root path, send a simple hello world message to the browser
-app.get("/", function(req, res) {
+app.get("/", (req, res) => {
   res.send("Hello world");
 });
 
 // scrape data
-app.get("/scrape", function(req, res) {
-	request("https://news.ycombinator.com/", function(error, response, html) {
-		var $ = cheerio.load(html);
-		$(".title").each(function(i, element){
+app.get("/scraper", (req, res) => {
+	request("https://news.ycombinator.com/", (error, response, html) => {
+		let $ = cheerio.load(html);
+		$(".title").each((i, element) => {
 			//parsing HTML
-			var title = $(element).children("a").text();
-			var link = $(element).children("a").attr("href");
+			let title = $(element).children("a").text();
+			let link = $(element).children("a").attr("href");
 			console.log(title);
 
 			res.json(html)
 
 			if(title && link){
-				db.scrapedData.insert({"title": title, "link":link}, function(err, inserted) {
+				db.scrapeCol.insert({"title": title, "link":link}, (err, inserted) => {
 					console.log(inserted); 
 				});
 			}
@@ -53,9 +91,9 @@ app.get("/scrape", function(req, res) {
 });
 
 // 2. At the "/all" path, display every entry in the animals collection
-app.get("/all", function(req, res) {
+app.get("/all", (req, res) => {
   // Query: In our database, go to the collection, then "find" everything
-  db.scrapedData.find({}, function(err, found) {
+  db.scrapeCol.find({}, (err, found) => {
     // Log any errors if the server encounters one
     if (err) {
       console.log(err);
@@ -67,8 +105,6 @@ app.get("/all", function(req, res) {
   });
 });
 
-
-// Set the app to listen on port 3000
-app.listen(3000, function() {
-  console.log("App running on port 3000!");
-});
+app.listen(PORT, () => {
+    console.log("Listening on port: ", PORT);
+	});
